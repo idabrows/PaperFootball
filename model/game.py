@@ -46,8 +46,28 @@ class Game:
         self.gameState.move(move)
 
 
+# from article
 
-# def get_all_allowed_moves(self):
+    def identities(self, state, actionValues):
+        identities = [(state, actionValues)]
+
+        currentBoard = state.board
+        currentAV = actionValues
+
+        currentBoard = self.gameState.turn_board(currentBoard)
+
+        currentAV = self.gameState.turn_board(currentAV)
+
+        identities.append((GameState(currentBoard, state.playerTurn), currentAV))
+
+        return identities
 
 
+    def step(self, action):
+        next_state, value, done = self.gameState.takeAction(action)
+        self.gameState = next_state
+        self.currentPlayer = -self.currentPlayer
+        info = None
+        return ((next_state, value, done, info))
 
+    # def get_all_allowed_moves(self):
