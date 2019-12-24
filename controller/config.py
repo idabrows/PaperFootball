@@ -13,6 +13,8 @@ LEARNING_RATE = 0.1
 MOMENTUM = 0.9
 TRAINING_LOOPS = 10
 
+INPUT_SHAPE = (2,48,8)
+
 HIDDEN_CNN_LAYERS = [
     {'filters': 75, 'kernel_size': (4, 4)}
     , {'filters': 75, 'kernel_size': (4, 4)}
@@ -22,5 +24,5 @@ HIDDEN_CNN_LAYERS = [
     , {'filters': 75, 'kernel_size': (4, 4)}
 ]
 
-EVAL_EPISODES = 20
-SCORING_THRESHOLD = 1.3
+EVAL_EPISODES = 10
+SCORING_THRESHOLD = 1.1
