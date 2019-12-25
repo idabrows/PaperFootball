@@ -6,17 +6,23 @@ from model.game_state import GameState
 def empty_board():
     board = np.zeros((48, 8), dtype=int)
 
-    # board[1::4, 0] = 2
-    # board[:5, :] = 2
-    # board[-5:, :] = 2
-
+    # # board[1::4, 0] = 2
+    # # board[:5, :] = 2
+    # # board[-5:, :] = 2
+    #
+    # board[1::4, 0] = 1
+    # board[:5, :] = 1
+    # board[-5:, :] = 1
+    #
+    # board[1:5, [3, 4]] = 0
+    # board[-5:0, [3, 4]] = 0
     board[1::4, 0] = 1
     board[:5, :] = 1
-    board[-5:, :] = 1
-
+    board[-4:, :] = 1
     board[1:5, [3, 4]] = 0
-    board[-5:0, [3, 4]] = 0
-
+    board[-5:, [3, 4]] = 0
+    board[1, 3] = 1
+    board[-3, 3] = 1
     return board
 
 
@@ -34,13 +40,6 @@ class Game:
         self.currentPlayer = 1
         return self.gameState
 
-    def change_turn(self):
-        self.gameState.turn_board()
-        self.gameState.playerTurn = -self.gameState.playerTurn
-        self.currentPlayer = -self.currentPlayer
-
-    def get_all_allowed_actions(self):
-        return self.gameState.get_neighbours(self.gameState.current_position)
 
     def make_move(self, move):
         self.gameState.move(move)
@@ -63,11 +62,21 @@ class Game:
         return identities
 
 
-    def step(self, action):
-        next_state, value, done = self.gameState.takeAction(action)
-        self.gameState = next_state
-        self.currentPlayer = -self.currentPlayer
-        info = None
-        return ((next_state, value, done, info))
+    # def step(self, action):
+    #     next_state, value, done = self.gameState.takeAction(action)
+    #     self.gameState = next_state
+    #     self.currentPlayer = -self.currentPlayer
+    #     info = None
+    #     return ((next_state, value, done, info))
 
-    # def get_all_allowed_moves(self):
+    def get_all_allowed_moves(self):
+        return self.gameState.get_full_moves()
+
+    def make_move(self, move):
+        return self.gameState.make_move(move)
+
+    def change_player(self):
+        self.currentPlayer = -self.currentPlayer
+        self.gameState.playerTurn = -self.gameState.playerTurn
+        self.gameState.board = self.gameState.turn_board(self.gameState.board)
+        self.gameState.current_position = (12 - self.gameState.current_position[0], 8 - self.gameState.current_position[1])

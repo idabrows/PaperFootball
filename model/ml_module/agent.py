@@ -136,11 +136,50 @@
 #     def changeRootMCTS(self, state):
 #         self.mcts.root = self.mcts.tree[state.id]
 # #
+import copy
+
+from controller import config
+import numpy as np
+
 
 class Agent:
-    def __init__(self, name,  model):
+    def __init__(self, name, model):
         self.name = name
         self.model = model
 
-    def retrain(self,memory):
-        pass
+    def retrain(self, memory, config=config):
+        for i in range(config.TRAINING_LOOPS):
+            # print([row['state'] for row in memory.ltmemory][0])
+            # [self.model.convertToModelInput(row['state']) for row in memory.ltmemory]
+            training_states = np.array([self.model.convertToModelInput_fit(row['state']) for row in memory.ltmemory])
+            training_targets = {'value_head': np.array([row['result'] for row in memory.ltmemory])}
+            print(training_states.shape)
+            self.model.fit(training_states, training_targets, epochs=config.EPOCHS, verbose=1, validation_split=0,
+                           batch_size=4)
+
+    #             self.train_overall_loss.append(round(fit.history['loss'][config.EPOCHS - 1], 4))
+    #             self.train_value_loss.append(round(fit.history['value_head_loss'][config.EPOCHS - 1], 4))
+    #             self.train_policy_loss.append(round(fit.history['policy_head_loss'][config.EPOCHS - 1], 4))
+
+    def get_move(self, env):
+        best_move, best_score = None, -100
+        for move in env.get_all_allowed_moves():
+            sc = self.score_move(move, env)
+            if sc > best_score:
+                best_score = sc
+                best_move = move
+                if sc == 100:
+                    return best_move
+        return best_move
+
+    def score_move(self, move, env):
+        env_test = copy.deepcopy(env)
+        done, result = env_test.make_move(move)
+        if done == 1:
+            if result == 1:
+                return 100
+            else:
+                return -99
+        else:
+            # print('Predictin: ', self.model.predict(env_test.gameState.board, env_test.gameState.current_position))
+            return self.model.predict(self.model.convertToModelInput(env_test.gameState.board), env_test.gameState.current_position)

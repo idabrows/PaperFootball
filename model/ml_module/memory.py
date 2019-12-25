@@ -16,7 +16,7 @@ class Memory:
         self.stmemory.append({
             'player': player
             , 'state': state
-            , 'result': result
+            , ' ': result
             , 'current_position': current_position
         })
 
@@ -36,7 +36,7 @@ class Memory:
 
         for i in self.stmemory:
             self.ltmemory.append(i)
-        self.clear_stmemory()
+        self.stmemory.clear()
 
     # def commit_ltmemory(self):
     #     for i in self.stmemory:

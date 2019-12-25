@@ -24,13 +24,13 @@ class GameState:
                     if j == 0:
                         board2[i, j] = 1
                     else:
-                        board2[i, j] = self.board[46 - i, 8 - j]
+                        board2[i, j] = board[46 - i, 8 - j]
                 elif i % 4 == 2:
-                    board2[i + 2, j] = self.board[46 - i, 7 - j]
+                    board2[i + 2, j] = board[46 - i, 7 - j]
                 elif i % 4 == 0:
-                    board2[i + 2, j] = self.board[46 - i, 7 - j]
+                    board2[i + 2, j] = board[46 - i, 7 - j]
                 elif i % 4 == 3:
-                    board2[i + 4, j] = self.board[46 - i, 7 - j]
+                    board2[i + 4, j] = board[46 - i, 7 - j]
 
         board2[44, 3] = board[4, 4]
         board2[44, 4] = board[4, 3]
@@ -49,10 +49,16 @@ class GameState:
         board2[3, 3] = board[47, 4]
         return board2
 
-    def _allowed_actions(self):
-        neighbours = self.get_neighbours(self.current_position)
-        allowed = [self.get_move(self.current_position, x) for x in neighbours]
-        allowed = [x for x in allowed if self.board[x[0], x[1]] == 0]
+    def _allowed_actions(self, tmp_board=None, tmp_current_position=None):
+        if tmp_board is not None and tmp_current_position is not None:
+            neighbours = self.get_neighbours(tmp_current_position)
+            allowed = [self.get_move(tmp_current_position, x) for x in neighbours]
+            allowed = [x for x in allowed if tmp_board[x[0], x[1]] == 0]
+        else:
+            neighbours = self.get_neighbours(self.current_position)
+            allowed = [self.get_move(self.current_position, x) for x in neighbours]
+            allowed = [x for x in allowed if self.board[x[0], x[1]] == 0]
+
         return allowed
 
     def move(self, position):
@@ -86,10 +92,10 @@ class GameState:
                       (position[0] + 1, position[1] - 1), (position[0] - 1, position[1] + 1)]
         to_del = []
         for x in neighbours:
-            if (x[0] < 0) or (x[0] > 12):
+            if (x[0] < 0) or (x[0] >= 12):
                 to_del.append(x)
                 continue
-            elif (x[1] < 0) or (x[1] > 8):
+            elif (x[1] < 0) or (x[1] >= 8):
                 to_del.append(x)
 
         return [x for x in neighbours if x not in to_del]
@@ -118,7 +124,7 @@ class GameState:
         return y, x
 
     @staticmethod
-    def get_positions(x, y):
+    def get_positions(y, x):
         position1 = [0, 0]
         position2 = [0, 0]
         position1[1] = x
@@ -138,7 +144,7 @@ class GameState:
             position2[1] = x + 1
             position1[0] = int(y / 4) + 1
             position2[0] = int(y / 4)
-        return position1, position2
+        return tuple(position1), tuple(position2)
 
     def get_all_lines(self):
         lines = []
@@ -148,18 +154,65 @@ class GameState:
                     lines.append(self.get_positions(j, i))
         return lines
 
-
-# from article
-    def _allowedActions(self, allowed = [], path = []):
-        for a in self.get_neighbours(self.current_position):
-            if a not in path:
-                if len(self.get_neighbours(a)) == 7:
-                    path.append(a)
-                    allowed.append(path)
+    def get_full_moves(self):
+        full_moves = []
+        def get_full_moves_utils(self, path, board, tmp_current_pos):
+            if tmp_current_pos != self.current_position and len(self._allowed_actions(board, tmp_current_pos)) == 7:
+                full_moves.append((path,tmp_current_pos, 0, board))
+                return
+            if tmp_current_pos in {(0, 3), (0, 4), (0, 5)}:
+                full_moves.append((path, tmp_current_pos, 1, board))
+            if tmp_current_pos in {(12, 3), (12, 4), (12, 5)}:
+                return
+            # print(self._allowed_actions(board,tmp_current_pos))
+            for neighbour in self._allowed_actions(board,tmp_current_pos):
+                tmp_board = board.copy()
+                tmp_path = path.copy()
+                positions = self.get_positions(neighbour[0], neighbour[1])
+                if positions[0] == tmp_current_pos:
+                    x, y = positions[1]
                 else:
-                    path.append(a)
-                    allowed += self._allowedActions(self, allowed = allowed, path = path)
-        return allowed
+                    x, y = positions[0]
+
+                # print(x,y)
+                tmp_board[neighbour] = 1
+                tmp_path.append(neighbour)
+                # print('tmp_path: ', tmp_path)
+                # print('tmp_board: ', tmp_board)
+                # print('tmp_current_pos: ', tmp_current_pos)
+                # print('neighbour: ', neighbour)
+
+                get_full_moves_utils(self, tmp_path, tmp_board, (x, y))
+        get_full_moves_utils(self, [], self.board, self.current_position)
+        return  full_moves
+
+    def make_move(self, move):
+        # print(move)
+        if len(move) == 0:
+            return 1, -1
+        self.current_position = move[1]
+        for line in move[0]:
+            self.board[line[0], line[1]] = 1
+        done = 1
+        if move[2] == 0:
+            done = 0
+        return done, move[2]
+
+
+
+
+# # from article
+#     def _allowedActions(self, allowed = [], path = []):
+#         for a in self.get_neighbours(self.current_position):
+#             if a not in path:
+#                 if len(self.get_neighbours(a)) == 7:
+#                     path.append(a)
+#                     allowed.append(path)
+#                 else:
+#                     path.append(a)
+#                     allowed += self._allowedActions(self, allowed = allowed, path = path)
+#         return allowed
+
 
     # def _binary(self):
     #

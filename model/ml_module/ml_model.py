@@ -14,11 +14,12 @@ run_archive_folder = './run_archive/'
 
 class Gen_Model():
     def __init__(self, reg_const, learning_rate, input_dim):
+        self.model = None
         self.reg_const = reg_const
         self.learning_rate = learning_rate
         self.input_dim = input_dim
 
-    def predict(self, x):
+    def predict(self, x, pos=None):
         return self.model.predict(x)
 
     def fit(self, states, targets, epochs, verbose, validation_split, batch_size):
@@ -165,8 +166,8 @@ class Residual_NN_simple(Gen_Model):
 
         main_input = Input(shape=self.input_dim, name='main_input')
 
-        x = self.conv_layer(main_input, self.hidden_layers[0]['filters'], self.hidden_layers[0]['kernel_size'])
-
+        x = self.conv_layer(main_input, filters=self.hidden_layers[0]['filters'], kernel_size=self.hidden_layers[0]['kernel_size'])
+        print(x)
         if len(self.hidden_layers) > 1:
             for h in self.hidden_layers[1:]:
                 x = self.residual_layer(x, h['filters'], h['kernel_size'])
@@ -182,10 +183,21 @@ class Residual_NN_simple(Gen_Model):
         return model
 
     def convertToModelInput(self, state):
-        inputToModel = state.binary  # np.append(state.binary, [(state.playerTurn + 1)/2] * self.input_dim[1] * self.input_dim[2])
-        inputToModel = np.reshape(inputToModel, self.input_dim)
+        # inputToModel = state.binary  # np.append(state.binary, [(state.playerTurn + 1)/2] * self.input_dim[1] * self.input_dim[2])
+        # print(state)
+        inputToModel = np.reshape(state, (1,48,8,1))
         return (inputToModel)
 
+    def convertToModelInput_fit(self, state):
+        # inputToModel = state.binary  # np.append(state.binary, [(state.playerTurn + 1)/2] * self.input_dim[1] * self.input_dim[2])
+        # print(state)
+        inputToModel = np.reshape(state, (48,8,1))
+        return (inputToModel)
+
+
+    def predict(self, x, pos=None):
+        # input = self.convertToModelInput(x)
+        return self.model.predict(x)
 # class Residual_CNN(Gen_Model):
 #     def __init__(self, reg_const, learning_rate, input_dim, output_dim, hidden_layers):
 #         Gen_Model.__init__(self, reg_const, learning_rate, input_dim, output_dim)

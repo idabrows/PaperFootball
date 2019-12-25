@@ -101,27 +101,58 @@
 #                 points[players[state.playerTurn]['name']].append(pts[0])
 #                 points[players[-state.playerTurn]['name']].append(pts[1])
 #     return scores, memory, points, sp_scores
-from random import random
+import random
 from controller import config
 from model.game import Game
 
 
-def play_training(p1, p2, memory):
+def play_training(p1, p2, memory, episodes):
     env = Game()
     players = {1: p1, -1: p2}
-    for e in range(config.EPISODES):
+    for e in range(episodes):
+        print(e)
         env.reset()
         done, result = 0, 0
         if random.randint(0, 1) > 0.5:
             p1, p2 = p2, p1
         while done == 0:
-            next_state, curr_point, move = players[env.currentPlayer].get_move(env)
-            memory.append_stmemory(env.currentPlayer, next_state, curr_point)
+            move = players[env.currentPlayer].get_move(env)
+            memory.append_stmemory(env.currentPlayer, move[3], move[1])
             done, result = env.make_move(move)
             if done == 1:
                 memory.commit_stmemory(env, result)
-            env.change_turn()
+            env.change_player()
     # return memory
 
-def play_valid(p1, p2):
-    pass
+
+def play_valid(p1, p2, episodes):
+    env = Game()
+    players = {1: p1, -1: p2}
+    scores = {p1.name: 0, p2.name: 0}
+    for e in range(int(episodes / 2)):
+        print(e)
+        env.reset()
+        env.currentPlayer = 1
+        done, result = 0, 0
+        while done == 0:
+            move = players[env.currentPlayer].get_move(env)
+            # print(move[0],'      ',move[1])
+            done, result = env.make_move(move)
+            # print(env.gameState.board)
+            if done == 1:
+                scores[players[env.currentPlayer].name] += max(0, result)
+                scores[players[-env.currentPlayer].name] += max(0, -result)
+            # print('CHANGE PLAYER!!!')
+            env.change_player()
+    for e in range(int(episodes / 2)):
+        env.reset()
+        env.currentPlayer = -1
+        done, result = 0, 0
+        while done == 0:
+            move = players[env.currentPlayer].get_move(env)
+            done, result = env.make_move(move)
+            if done == 1:
+                scores[players[env.currentPlayer].name] += max(0, result)
+                scores[players[-env.currentPlayer].name] += max(0, -result)
+            env.change_player()
+    return scores
