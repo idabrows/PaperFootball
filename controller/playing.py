@@ -110,7 +110,7 @@ def play_training(p1, p2, memory, episodes, random_moves=0):
     env = Game()
     players = {1: p1, -1: p2}
     for e in range(episodes):
-        print(e)
+        print('game', e)
         env.reset()
         done, result = 0, 0
         if random.randint(0, 1) > 0.5:
@@ -119,6 +119,7 @@ def play_training(p1, p2, memory, episodes, random_moves=0):
         while done == 0:
             move = players[env.currentPlayer].get_move(env, turn, random_moves)
             memory.append_stmemory(env.currentPlayer, move[3], move[1])
+            print(move[1],'      ',move[0])
             done, result = env.make_move(move)
             if done == 1:
                 memory.commit_stmemory(env, result)
@@ -152,7 +153,7 @@ def play_valid(p1, p2, episodes, random_moves=0):
         env.currentPlayer = -1
         done, result = 0, 0
         while done == 0:
-            move = players[env.currentPlayer].get_move(env, turn)
+            move = players[env.currentPlayer].get_move(env, turn, random_moves)
             done, result = env.make_move(move)
             if done == 1:
                 scores[players[env.currentPlayer].name] += max(0, result)

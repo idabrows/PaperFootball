@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 from collections import deque
 from controller import config
@@ -8,8 +10,12 @@ class Memory:
         self.MEMORY_SIZE = size
         self.ltmemory = deque(maxlen=size)
         self.stmemory = deque(maxlen=size)
+        self.iter = 0
 
     def clear_ltmemory(self):
+        self.iter += 1
+        file = open('games'+str(self.iter), 'wb')
+        pickle.dump(self.ltmemory, file)
         self.ltmemory.clear()
 
     def append_stmemory(self, player, state, current_position=None, result=None):

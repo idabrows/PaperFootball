@@ -92,10 +92,14 @@ class GameState:
                       (position[0] + 1, position[1] - 1), (position[0] - 1, position[1] + 1)]
         to_del = []
         for x in neighbours:
-            if (x[0] < 0) or (x[0] >= 12):
+            if (x[0] < 0) or (x[0] > 12):
                 to_del.append(x)
                 continue
-            elif (x[1] < 0) or (x[1] >= 8):
+            elif (x[1] < 0) or (x[1] > 8):
+                to_del.append(x)
+            if (position[0] == 12) and (x[0] == 12):
+                to_del.append(x)
+            if (position[1] == 8) and (x[1] == 8):
                 to_del.append(x)
 
         return [x for x in neighbours if x not in to_del]
@@ -156,16 +160,17 @@ class GameState:
 
     def get_full_moves(self):
         full_moves = []
+
         def get_full_moves_utils(self, path, board, tmp_current_pos):
             if tmp_current_pos != self.current_position and len(self._allowed_actions(board, tmp_current_pos)) == 7:
-                full_moves.append((path,tmp_current_pos, 0, board))
+                full_moves.append((path, tmp_current_pos, 0, board))
                 return
             if tmp_current_pos in {(0, 3), (0, 4), (0, 5)}:
                 full_moves.append((path, tmp_current_pos, 1, board))
             if tmp_current_pos in {(12, 3), (12, 4), (12, 5)}:
                 return
             # print(self._allowed_actions(board,tmp_current_pos))
-            for neighbour in self._allowed_actions(board,tmp_current_pos):
+            for neighbour in self._allowed_actions(board, tmp_current_pos):
                 tmp_board = board.copy()
                 tmp_path = path.copy()
                 positions = self.get_positions(neighbour[0], neighbour[1])
@@ -183,8 +188,9 @@ class GameState:
                 # print('neighbour: ', neighbour)
 
                 get_full_moves_utils(self, tmp_path, tmp_board, (x, y))
+
         get_full_moves_utils(self, [], self.board, self.current_position)
-        return  full_moves
+        return full_moves
 
     def make_move(self, move):
         # print(move)
@@ -197,9 +203,6 @@ class GameState:
         if move[2] == 0:
             done = 0
         return done, move[2]
-
-
-
 
 # # from article
 #     def _allowedActions(self, allowed = [], path = []):
@@ -214,68 +217,68 @@ class GameState:
 #         return allowed
 
 
-    # def _binary(self):
-    #
-    # 	currentplayer_position = np.zeros(len(self.board), dtype=np.int)
-    # 	currentplayer_position[self.board==self.playerTurn] = 1
-    #
-    # 	other_position = np.zeros(len(self.board), dtype=np.int)
-    # 	other_position[self.board==-self.playerTurn] = 1
-    #
-    # 	position = np.append(currentplayer_position,other_position)
-    #
-    # 	return (position)
-    #
-    # def _convertStateToId(self):
-    # 	player1_position = np.zeros(len(self.board), dtype=np.int)
-    # 	player1_position[self.board==1] = 1
-    #
-    # 	other_position = np.zeros(len(self.board), dtype=np.int)
-    # 	other_position[self.board==-1] = 1
-    #
-    # 	position = np.append(player1_position,other_position)
-    #
-    # 	id = ''.join(map(str,position))
-    #
-    # 	return id
-    #
-    # def _checkForEndGame(self):
-    # 	if np.count_nonzero(self.board) == 42:
-    # 		return 1
-    #
-    # 	for x,y,z,a in self.winners:
-    # 		if (self.board[x] + self.board[y] + self.board[z] + self.board[a] == 4 * -self.playerTurn):
-    # 			return 1
-    # 	return 0
-    #
-    #
-    # def _getValue(self):
-    # 	# This is the value of the state for the current player
-    # 	# i.e. if the previous player played a winning move, you lose
-    # 	for x,y,z,a in self.winners:
-    # 		if (self.board[x] + self.board[y] + self.board[z] + self.board[a] == 4 * -self.playerTurn):
-    # 			return (-1, -1, 1)
-    # 	return (0, 0, 0)
-    #
-    #
-    # def _getScore(self):
-    # 	tmp = self.value
-    # 	return (tmp[1], tmp[2])
-    #
-    #
-    #
-    #
-    # def takeAction(self, action):
-    # 	newBoard = np.array(self.board)
-    # 	newBoard[action]=self.playerTurn
-    #
-    # 	newState = GameState(newBoard, -self.playerTurn)
-    #
-    # 	value = 0
-    # 	done = 0
-    #
-    # 	if newState.isEndGame:
-    # 		value = newState.value[0]
-    # 		done = 1
-    #
-    # 	return (newState, value, done)
+# def _binary(self):
+#
+# 	currentplayer_position = np.zeros(len(self.board), dtype=np.int)
+# 	currentplayer_position[self.board==self.playerTurn] = 1
+#
+# 	other_position = np.zeros(len(self.board), dtype=np.int)
+# 	other_position[self.board==-self.playerTurn] = 1
+#
+# 	position = np.append(currentplayer_position,other_position)
+#
+# 	return (position)
+#
+# def _convertStateToId(self):
+# 	player1_position = np.zeros(len(self.board), dtype=np.int)
+# 	player1_position[self.board==1] = 1
+#
+# 	other_position = np.zeros(len(self.board), dtype=np.int)
+# 	other_position[self.board==-1] = 1
+#
+# 	position = np.append(player1_position,other_position)
+#
+# 	id = ''.join(map(str,position))
+#
+# 	return id
+#
+# def _checkForEndGame(self):
+# 	if np.count_nonzero(self.board) == 42:
+# 		return 1
+#
+# 	for x,y,z,a in self.winners:
+# 		if (self.board[x] + self.board[y] + self.board[z] + self.board[a] == 4 * -self.playerTurn):
+# 			return 1
+# 	return 0
+#
+#
+# def _getValue(self):
+# 	# This is the value of the state for the current player
+# 	# i.e. if the previous player played a winning move, you lose
+# 	for x,y,z,a in self.winners:
+# 		if (self.board[x] + self.board[y] + self.board[z] + self.board[a] == 4 * -self.playerTurn):
+# 			return (-1, -1, 1)
+# 	return (0, 0, 0)
+#
+#
+# def _getScore(self):
+# 	tmp = self.value
+# 	return (tmp[1], tmp[2])
+#
+#
+#
+#
+# def takeAction(self, action):
+# 	newBoard = np.array(self.board)
+# 	newBoard[action]=self.playerTurn
+#
+# 	newState = GameState(newBoard, -self.playerTurn)
+#
+# 	value = 0
+# 	done = 0
+#
+# 	if newState.isEndGame:
+# 		value = newState.value[0]
+# 		done = 1
+#
+# 	return (newState, value, done)
