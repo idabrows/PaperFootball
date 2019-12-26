@@ -16,9 +16,10 @@ def main_train():
     best_player = Agent('best_player',  best_nn)
     # print('a')
     i = 0
-    while i < 40:
+    while i < 20:
+        i+=1
         print('Iteration ',i)
-        play_training(best_player, best_player, memory, config.EPISODES)
+        play_training(best_player, best_player, memory, config.EPISODES, config.TURNS_UNTIL_DET)
         if len(memory.ltmemory) >= config.MEMORY_SIZE:
             current_player.retrain(memory)
             memory.clear_ltmemory()
@@ -32,6 +33,8 @@ def main_train():
 b = main_train()
 file = open('important', 'wb')
 pickle.dump(b, file)
-playerR = Agent('random_player', RandomModel())
+# file = open('important', 'rb')
+# b=pickle.load(file)
+playerR = Agent('random_player', RandomModel(),)
 sc = play_valid(b, playerR, episodes=20)
 print(sc)

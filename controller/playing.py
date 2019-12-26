@@ -106,7 +106,7 @@ from controller import config
 from model.game import Game
 
 
-def play_training(p1, p2, memory, episodes):
+def play_training(p1, p2, memory, episodes, random_moves=0):
     env = Game()
     players = {1: p1, -1: p2}
     for e in range(episodes):
@@ -115,17 +115,19 @@ def play_training(p1, p2, memory, episodes):
         done, result = 0, 0
         if random.randint(0, 1) > 0.5:
             p1, p2 = p2, p1
+        turn = 0
         while done == 0:
-            move = players[env.currentPlayer].get_move(env)
+            move = players[env.currentPlayer].get_move(env, turn, random_moves)
             memory.append_stmemory(env.currentPlayer, move[3], move[1])
             done, result = env.make_move(move)
             if done == 1:
                 memory.commit_stmemory(env, result)
             env.change_player()
+            turn += 1
     # return memory
 
 
-def play_valid(p1, p2, episodes):
+def play_valid(p1, p2, episodes, random_moves=0):
     env = Game()
     players = {1: p1, -1: p2}
     scores = {p1.name: 0, p2.name: 0}
@@ -134,8 +136,9 @@ def play_valid(p1, p2, episodes):
         env.reset()
         env.currentPlayer = 1
         done, result = 0, 0
+        turn = 0
         while done == 0:
-            move = players[env.currentPlayer].get_move(env)
+            move = players[env.currentPlayer].get_move(env, turn, random_moves)
             # print(move[0],'      ',move[1])
             done, result = env.make_move(move)
             # print(env.gameState.board)
@@ -149,10 +152,11 @@ def play_valid(p1, p2, episodes):
         env.currentPlayer = -1
         done, result = 0, 0
         while done == 0:
-            move = players[env.currentPlayer].get_move(env)
+            move = players[env.currentPlayer].get_move(env, turn)
             done, result = env.make_move(move)
             if done == 1:
                 scores[players[env.currentPlayer].name] += max(0, result)
                 scores[players[-env.currentPlayer].name] += max(0, -result)
             env.change_player()
+            turn += 1
     return scores

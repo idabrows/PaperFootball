@@ -137,13 +137,14 @@
 #         self.mcts.root = self.mcts.tree[state.id]
 # #
 import copy
+import random
 
 from controller import config
 import numpy as np
 
 
 class Agent:
-    def __init__(self, name, model):
+    def __init__(self, name, model, random_moves=0):
         self.name = name
         self.model = model
 
@@ -161,10 +162,10 @@ class Agent:
     #             self.train_value_loss.append(round(fit.history['value_head_loss'][config.EPOCHS - 1], 4))
     #             self.train_policy_loss.append(round(fit.history['policy_head_loss'][config.EPOCHS - 1], 4))
 
-    def get_move(self, env):
+    def get_move(self, env, turn, random_moves):
         best_move, best_score = None, -100
         for move in env.get_all_allowed_moves():
-            sc = self.score_move(move, env)
+            sc = self.score_move(move, env, turn, random_moves)
             if sc > best_score:
                 best_score = sc
                 best_move = move
@@ -172,7 +173,7 @@ class Agent:
                     return best_move
         return best_move
 
-    def score_move(self, move, env):
+    def score_move(self, move, env, turn, random_moves):
         env_test = copy.deepcopy(env)
         done, result = env_test.make_move(move)
         if done == 1:
@@ -181,5 +182,7 @@ class Agent:
             else:
                 return -99
         else:
+            if turn < random_moves:
+                return random.uniform(0, 1)
             # print('Predictin: ', self.model.predict(env_test.gameState.board, env_test.gameState.current_position))
             return self.model.predict(self.model.convertToModelInput(env_test.gameState.board), env_test.gameState.current_position)
