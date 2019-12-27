@@ -113,7 +113,6 @@ def main():
     board.draw_board()
     board.draw_lines(
 
-
 [([0, 0], [0, 1]),
  ([0, 1], [0, 2]),
  ([0, 2], [0, 3]),
@@ -151,13 +150,15 @@ def main():
  ([2, 0], [3, 0]),
  ([3, 0], [4, 0]),
  ([4, 0], [5, 0]),
+ ([4, 1], [5, 2]),
+ ([5, 0], [4, 1]),
+ ([5, 0], [5, 1]),
  ([5, 0], [6, 0]),
+ ([5, 2], [6, 3]),
+ ([6, 3], [6, 4]),
  ([6, 0], [7, 0]),
- ([6, 4], [7, 5]),
  ([7, 0], [8, 0]),
- ([7, 5], [8, 6]),
  ([8, 0], [9, 0]),
- ([8, 6], [9, 6]),
  ([9, 0], [10, 0]),
  ([10, 0], [11, 0]),
  ([11, 0], [11, 1]),
@@ -189,9 +190,11 @@ def main():
     #board.canvas.bind('<Button>', board.on_click)
     #board.canvas.tag_bind(board.points_gui[1][1], "<Any-Enter>", functools.partial(board.mouseEnter, point_to=Point(1, 1)))
     #board.canvas.tag_bind(board.points_gui[1][1], "<Any-Leave>", board.mouseLeave)
-    board.canvas.pack(fill="both", expand=True)
-    board.window.geometry("400x600")
-    board.window.mainloop()
-    print(board.points_gui)
 
-main()
+
+#     board.canvas.pack(fill="both", expand=True)
+#     board.window.geometry("400x600")
+#     board.window.mainloop()
+#     print(board.points_gui)
+#
+# main()

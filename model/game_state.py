@@ -1,5 +1,7 @@
 import numpy as np
 
+from controller import config
+
 
 class GameState:
     def __init__(self, board, player_turn, current_position):
@@ -18,7 +20,7 @@ class GameState:
         board2[-5:, [3, 4]] = 0
         board2[1, 3] = 1
         board2[-3, 3] = 1
-        for i in range(5, 42):
+        for i in range(3, 43):
             for j in range(8):
                 if i % 4 == 1:
                     if j == 0:
@@ -47,6 +49,7 @@ class GameState:
         board2[2, 3] = board[46, 4]
         board2[3, 4] = board[47, 3]
         board2[3, 3] = board[47, 4]
+        del board
         return board2
 
     def _allowed_actions(self, tmp_board=None, tmp_current_position=None):
@@ -162,6 +165,8 @@ class GameState:
         full_moves = []
 
         def get_full_moves_utils(self, path, board, tmp_current_pos):
+            if len(full_moves) >config.max_t:
+                return
             if tmp_current_pos != self.current_position and len(self._allowed_actions(board, tmp_current_pos)) == 7:
                 full_moves.append((path, tmp_current_pos, 0, board))
                 return
@@ -193,6 +198,12 @@ class GameState:
         return full_moves
 
     def make_move(self, move):
+        """
+        Ok
+        Applies move to game enviroment
+        @param move: move to apply (lines, new current point, result, new board)
+        @return: done and result
+        """
         # print(move)
         if len(move) == 0:
             return 1, -1

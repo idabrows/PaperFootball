@@ -155,8 +155,8 @@ class Agent:
             training_states = np.array([self.model.convertToModelInput_fit(row['state']) for row in memory.ltmemory])
             training_targets = {'value_head': np.array([row['result'] for row in memory.ltmemory])}
             print(training_states.shape)
-            self.model.fit(training_states, training_targets, epochs=config.EPOCHS, verbose=1, validation_split=0,
-                           batch_size=4)
+            self.model.fit(training_states, training_targets, epochs=config.EPOCHS, verbose=1, validation_split=0.2,
+                           batch_size=config.BATCH_SIZE)
 
     #             self.train_overall_loss.append(round(fit.history['loss'][config.EPOCHS - 1], 4))
     #             self.train_value_loss.append(round(fit.history['value_head_loss'][config.EPOCHS - 1], 4))
@@ -166,6 +166,8 @@ class Agent:
         best_move, best_score = None, -100
         all_moves = env.get_all_allowed_moves()
         print(len(all_moves))
+        if len(all_moves) > 1000:
+            all_moves = random.sample(all_moves, 1000)
         for move in all_moves:
             sc = self.score_move(move, env, turn, random_moves)
             if sc > best_score:

@@ -8,14 +8,14 @@ from controller import config
 class Memory:
     def __init__(self, size):
         self.MEMORY_SIZE = size
-        self.ltmemory = deque(maxlen=size)
-        self.stmemory = deque(maxlen=size)
+        self.ltmemory = deque(maxlen=2*size)
+        self.stmemory = deque(maxlen=2*size)
         self.iter = 0
 
     def clear_ltmemory(self):
         self.iter += 1
-        file = open('games'+str(self.iter), 'wb')
-        pickle.dump(self.ltmemory, file)
+        # file = open('games'+str(self.iter), 'wb')
+        # pickle.dump(self.ltmemory, file)
         self.ltmemory.clear()
 
     def append_stmemory(self, player, state, current_position=None, result=None):

@@ -41,8 +41,8 @@ class Game:
         return self.gameState
 
 
-    def make_move(self, move):
-        self.gameState.move(move)
+    # def make_move(self, move):
+    #     self.gameState.move(move)
 
 
 # from article
