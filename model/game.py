@@ -41,10 +41,6 @@ class Game:
         return self.gameState
 
 
-    # def make_move(self, move):
-    #     self.gameState.move(move)
-
-
 # from article
 
     def identities(self, state, actionValues):
@@ -68,6 +64,7 @@ class Game:
     #     self.currentPlayer = -self.currentPlayer
     #     info = None
     #     return ((next_state, value, done, info))
+
 
     def get_all_allowed_moves(self):
         return self.gameState.get_full_moves()

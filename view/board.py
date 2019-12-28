@@ -1,12 +1,10 @@
 import tkinter as tk
-
-from view.board_gui_service import BoardGuiService
-from view.request_board import RequestBoard
+from time import sleep
 
 
 class Board:
-    def __init__(self):
-        self.window = tk.Tk()
+    def __init__(self, window):
+        self.window = window
         self.canvas = tk.Canvas(self.window)
         self.square_size = 50
         self.point_radius = 2
@@ -101,24 +99,20 @@ class Board:
             self.square_size * point[1] + self.point_radius, self.square_size * point[0] +
             self.point_radius, fill="black")
 
-    def set_allowable_points(self):
-        print(self.current_point)
-        self.allowable_points = BoardGuiService.get_allowable_points(
-            RequestBoard(lines=self.lines, current_point=self.current_point, last_move=self.last_move))
-
     def get_clicked_point(self, board_x, board_y):
         for point in self.allowable_points:
             if point[0] * 50 - 5 <= board_y <= point[0] * 50 + 5 and point[1] * 50 - 5 <= board_x <= point[1] * 50 + 5:
                 return point
 
-    def implement_move(self, point):
-        self.lines.append([(self.current_point, point)])
-        self.last_move.append([(self.current_point, point)])
-        self.draw_lines([(self.current_point, point)])
+    def implement_move(self, path_points, tmp_current_pos, allowable_points):
         self.uncolor_point(self.current_point)
-        self.current_point = point
         for allowable_point in self.allowable_points:
             self.uncolor_point(allowable_point)
-        self.set_allowable_points()
+        for line in path_points:
+            self.lines.append(line)
+        self.last_move = path_points
+        self.draw_lines(path_points)
+        self.current_point = tmp_current_pos
+        self.allowable_points = allowable_points
         self.color_allowable_points()
         self.color_current_point()

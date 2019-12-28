@@ -1,7 +1,5 @@
 import numpy as np
 
-from controller import config
-
 
 class GameState:
     def __init__(self, board, player_turn, current_position):
@@ -49,10 +47,17 @@ class GameState:
         board2[2, 3] = board[46, 4]
         board2[3, 4] = board[47, 3]
         board2[3, 3] = board[47, 4]
-        del board
+        # for i in range(48):
+        #     for j in range(8):
+        # if (board[42,2] == 0 and board[6,5] == 0):
+            # print( self.get_positions(42,2))
+        # print('---------------------------------------')
+        # print(self.get_all_lines())
+        # else:
+        #     print('jest')
         return board2
 
-    def _allowed_actions(self, tmp_board=None, tmp_current_position=None):
+    def allowed_actions(self, tmp_board=None, tmp_current_position=None):
         if tmp_board is not None and tmp_current_position is not None:
             neighbours = self.get_neighbours(tmp_current_position)
             allowed = [self.get_move(tmp_current_position, x) for x in neighbours]
@@ -61,7 +66,6 @@ class GameState:
             neighbours = self.get_neighbours(self.current_position)
             allowed = [self.get_move(self.current_position, x) for x in neighbours]
             allowed = [x for x in allowed if self.board[x[0], x[1]] == 0]
-
         return allowed
 
     def move(self, position):
@@ -80,11 +84,6 @@ class GameState:
         if self.current_position[0] == 0:
             return 1
         return 0
-
-    def check_for_change_player(self):
-        if len(self._allowed_actions()) < 7:
-            return True
-        return False
 
     @staticmethod
     def get_neighbours(position):
@@ -153,21 +152,11 @@ class GameState:
             position2[0] = int(y / 4)
         return tuple(position1), tuple(position2)
 
-    def get_all_lines(self):
-        lines = []
-        for i in range(48):
-            for j in range(8):
-                if self.board[i, j] == 1:
-                    lines.append(self.get_positions(j, i))
-        return lines
-
     def get_full_moves(self):
         full_moves = []
 
         def get_full_moves_utils(self, path, board, tmp_current_pos):
-            if len(full_moves) >config.max_t:
-                return
-            if tmp_current_pos != self.current_position and len(self._allowed_actions(board, tmp_current_pos)) == 7:
+            if tmp_current_pos != self.current_position and len(self.allowed_actions(board, tmp_current_pos)) == 7:
                 full_moves.append((path, tmp_current_pos, 0, board))
                 return
             if tmp_current_pos in {(0, 3), (0, 4), (0, 5)}:
@@ -175,7 +164,7 @@ class GameState:
             if tmp_current_pos in {(12, 3), (12, 4), (12, 5)}:
                 return
             # print(self._allowed_actions(board,tmp_current_pos))
-            for neighbour in self._allowed_actions(board, tmp_current_pos):
+            for neighbour in self.allowed_actions(board, tmp_current_pos):
                 tmp_board = board.copy()
                 tmp_path = path.copy()
                 positions = self.get_positions(neighbour[0], neighbour[1])
@@ -195,15 +184,11 @@ class GameState:
                 get_full_moves_utils(self, tmp_path, tmp_board, (x, y))
 
         get_full_moves_utils(self, [], self.board, self.current_position)
+        # if self.current_position[0]  == 10 and self.current_position[1] == 2:
+
         return full_moves
 
     def make_move(self, move):
-        """
-        Ok
-        Applies move to game enviroment
-        @param move: move to apply (lines, new current point, result, new board)
-        @return: done and result
-        """
         # print(move)
         if len(move) == 0:
             return 1, -1

@@ -26,7 +26,7 @@ def main_train():
             current_player.retrain(memory)
             memory.clear_ltmemory()
             scores = play_valid(current_player, best_player, config.EVAL_EPISODES)
-            print(scores)
+            # print(scores)
             if ((scores['current_player']+1)/(scores['best_player']+1)) > config.SCORING_THRESHOLD:
                 best_player.model.model.set_weights(current_player.model.model.get_weights())
                 file = open('temp', 'wb')
