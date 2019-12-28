@@ -162,7 +162,7 @@ class Agent:
     #             self.train_value_loss.append(round(fit.history['value_head_loss'][config.EPOCHS - 1], 4))
     #             self.train_policy_loss.append(round(fit.history['policy_head_loss'][config.EPOCHS - 1], 4))
 
-    def get_move(self, env, turn, random_moves):
+    def get_move(self, env, turn=0, random_moves=-1):
         best_move, best_score = None, -100
         all_moves = env.get_all_allowed_moves()
         print(len(all_moves))
