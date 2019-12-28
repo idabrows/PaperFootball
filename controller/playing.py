@@ -120,8 +120,9 @@ def play_training(p1, p2, memory, episodes, random_moves=0):
         turn = 0
         while done == 0:
             move = players[env.currentPlayer].get_move(env, turn, random_moves)
-            memory.append_stmemory(env.currentPlayer, move[3], move[1])
-            print(move[1],'      ',move[0])
+            if len(move) > 0:
+                memory.append_stmemory(env.currentPlayer, move[3], move[1])
+                print(move[1],'      ',move[0])
             done, result = env.make_move(move)
             if done == 1:
                 memory.commit_stmemory(env, result)
