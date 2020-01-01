@@ -1,4 +1,5 @@
 import doctest
+import pickle
 from _tkinter import TclError
 from tkinter import Button
 import tkinter as tk
@@ -19,12 +20,28 @@ class BoardGui:
         self.board = None
         self.agent = None
         self.env = None
+        self.agent1 = None
+        self.agent2 = None
+
+        # player1_file = open("temp_fw_trained", "rb")
+        # player2_file = open("temp_fw_trained", "rb")
+        # self.player1 = pickle.load(player1_file)
+        # self.player2 = pickle.load(player2_file)
+
+
+        # file=open("temp_fw_trained", "rb")
+        # self.bot = pickle.load(file)
+        self.bot = Agent('dsdas', model=ForwardModel())
+
         self.set_game_window()
 
         self.set_panel()
 
-    def get_move(self):
-        (path, tmp_current_pos, _, board) = self.agent.get_move(self.env)
+    def get_move(self, bot=None):
+        if bot is not None:
+            (path, tmp_current_pos, _, board) = bot.get_move(self.env)
+        else:
+            (path, tmp_current_pos, _, board) = self.agent.get_move(self.env)
         self.env.make_move((path, tmp_current_pos, 0, board))
         self.env.change_player()
         tmp_current_pos = (12 - tmp_current_pos[0], 8 - tmp_current_pos[1])
@@ -54,13 +71,10 @@ class BoardGui:
                 for line in self.env.gameState.allowed_actions()]
 
     def on_click(self, event):
-        # print(self.get_all_lines(self.env.gameState.board))
-        # print("----------------------------------------")
-        # print(self.env.gameState.board[42, 2])
         point = self.board.get_clicked_point(event.x, event.y)
         if point:
             self.add_line_to_move(point)
-        if self.env.currentPlayer == 1:
+        if self.env.currentPlayer == -1:
             self.get_move()
 
     def new_game(self):
@@ -71,28 +85,55 @@ class BoardGui:
         finally:
             self.window = tk.Tk()
             self.set_game_window()
-            self.agent = Agent('forward_player', RandomModel())
+            self.agent = self.bot
             self.env = Game()
             self.board = Board(self.window)
             self.board.draw_board()
             self.board.color_current_point()
             self.board.color_allowable_points()
             self.board.canvas.pack(fill="both", expand=True)
-            self.board.canvas.bind('<>', self.get_move())
+            # self.board.canvas.bind('<>', self.get_move())
             self.board.canvas.bind('<Button>', self.on_click)
 
     def set_game_window(self):
-        print("set_game_window")
         self.window.geometry("400x600")
 
     def set_panel(self):
         frame = tk.Frame(self.root)
         frame.pack()
         button_new_game = Button(frame, text="New game", command=self.new_game, width="25")
+        button_new_robot_fight = Button(frame, text="New robot fight", command=self.new_game_bot, width="25")
+        button_next_robot_turn = Button(frame, text="Next move", command=self.next_move_bot, width="25")
         button_quit = Button(frame, text="Quit", command=self.close_windows, width="25")
         button_new_game.pack()
+        button_new_robot_fight.pack()
+        button_next_robot_turn.pack()
         button_quit.pack()
         self.root.mainloop()
+
+    def new_game_bot(self):
+        try:
+            self.window.destroy()
+        except TclError:
+            print("Game window closed")
+        finally:
+            self.window = tk.Tk()
+            self.set_game_window()
+            self.agent1 = self.bot
+            self.agent2 = self.bot
+            self.env = Game()
+            self.board = Board(self.window)
+            self.board.draw_board()
+            self.board.color_current_point()
+            self.board.color_allowable_points()
+            self.board.canvas.pack(fill="both", expand=True)
+
+    def next_move_bot(self):
+        if self.env.currentPlayer == 1:
+            self.get_move(self.agent1)
+        else:
+            self.get_move(self.agent2)
+
 
     def close_windows(self):
         self.window.destroy()
