@@ -71,11 +71,16 @@ class BoardGui:
                 for line in self.env.gameState.allowed_actions()]
 
     def on_click(self, event):
-        point = self.board.get_clicked_point(event.x, event.y)
-        if point:
-            self.add_line_to_move(point)
-        if self.env.currentPlayer == -1:
-            self.get_move()
+        print([self.env.gameState.get_move(x[0], x[1]) for x in [
+            [(12,8),(12,7)],[(11,8),(11,7)],[(2,8),(1,7)],[(11,1),(10,0)],
+            [(0, 0), (0, 1)], [(1, 0), (1, 1)], [(10, 0), (11, 1)], [(1, 7), (2, 8)]
+        ]])
+        # self.board.draw_lines([(0,0),(0,1)])
+        # point = self.board.get_clicked_point(event.x, event.y)
+        # if point:
+        #     self.add_line_to_move(point)
+        # if self.env.currentPlayer == -1:
+        #     self.get_move()
 
     def new_game(self):
         try:
